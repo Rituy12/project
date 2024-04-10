@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+      body {
+            background-color: #426990;
+            margin: 20px;
+      }
+      
+      .container {
+            max-width: 400px;
+            margin: auto;
+            
+      }
+      .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background-color:whitesmoke;
+            border-radius: 5px;
+      }
+      .item span {
+            flex-grow: 1;
+            margin-right: 10px;
+      }
+      
+      
+      .delete-btn {
+            
+            color: #fff;
+            border: none;
+            font-size:30px;
+            color:red;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+      }
+      
+      .item:hover .delete-btn {
+            opacity: 1; 
+      }
+      
+      #clear{
+      float: right;
+      background-color: purple;
+      }
+      
+    </style>
+    
+    <script>
+      
+      var task = [];
+      
+      var hoverItemIndex = -1;
+      
+      $(document).keydown(function(event){
+        console.log(event.keyCode);
+        
+        if(event.keyCode==46 && hoverItemIndex>=0)
+        {
+          deletetask(hoverItemIndex);
+        }
+      });
+      
+      $(document).ready(function(){
+        showAllTask();
+        
+        $("#add").click(function(){
+          
+          var a = $("#t1").val();
+          
+          if(a.length>0)
+          {
+            task.push(a);
+            saveToLocal(task);
+
+            $("#t1").val("");
+          }
+          else
+          {
+            alert("Task can not be empty");
+          }
+          
+          //console.log(task);
+          showAllTask();
+          
+          
+        });
+        
+        $("#clear").click(function(){
+          
+          task.length = 0;
+          saveToLocal(task);
+          $("#alltask").html("");
+          $("#taskcount").html(task.length);
+          
+        });
+        
+        $("#t1").keypress(function(event){
+          
+          //console.log(event.which);
+          
+          if(event.which==13)
+          {
+            $("#add").click();
+          }
+          
+        });
+        
+      });
+      
+      function showAllTask() {
+         if(getFromLocal()!=null){ 
+        task=getFromLocal();
+         }
+        $("#taskcount").html(task.length);
+        if(task.length>0)
+        {
+          
+          $("#alltask").html("");
+          
+          for(var i=0; i<task.length; i++)
+          {
+            var row = '<div class="item" onmouseover="sethoverindex('+i+')" > <span> '+task[i]+' </span> <i onclick="deletetask('+i+')" class="fa fa-trash delete-btn"></i> </div>';
+            $("#alltask").prepend(row);
+          }
+        }
+        else
+        {
+          
+        }
+      }
+      
+      function sethoverindex(index)
+      {
+        hoverItemIndex = index;
+      }
+      
+      function deletetask(index)
+      {
+        //console.log(index);
+        task.splice(index, 1);
+        saveToLocal(task);
+        $("#alltask .item").eq(index).remove();
+        showAllTask();
+      }
+      function saveToLocal(data)
+      {
+        var stringdata=JSON.stringify(data);
+        localStorage.setItem("taskdata", stringdata);
+      }
+      function getFromLocal()
+      {
+        var stringdata=localStorage.getItem("taskdata");
+        var data=JSON.parse(stringdata);
+        return data;
+      }
+      
+    </script>
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="text-center">ToDo App</h2>
+          <br>
+          <div class="todo-form">
+            <div class="input-group">
+              <input id="t1" type="text" class="form-control" placeholder="Add a new task" required>
+              <div class="input-group-append">
+<button class="btn btn-primary" type="button" id="add" >+</button>
+              </div>
+            </div>
+            <div class="list" id="alltask">
+              
+            </div>
+            <div class="list">
+              <div class="item" style="background-color: #fff;">
+                <span> You  have <b id="taskcount">0</b> pending  tasks <span>
+                  <button class="btn btn-success" type="button" id="clear">Clear All</button>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
